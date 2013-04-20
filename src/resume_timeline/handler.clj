@@ -4,6 +4,7 @@
             [hiccup.core :as h]
             [resume-timeline.mergesort :as merger]
             [compojure.route :as route]))
+
 (declare index basic-body show-list merge-sort parse-int string-to-int-list)
 
 (defroutes app-routes
