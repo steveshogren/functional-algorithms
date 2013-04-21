@@ -5,10 +5,11 @@
   (let [[named# _ therest#] (partition-by #(= :& %) args)
         theargs# (vec (concat named# therest#))
         mainarg# ['a]]
-    (print (str "the args:" theargs#))
-    (print (str "main arg" mainarg#))
+    #_(println (str "the args:" theargs#))
+    (println (str "the let: " (first (map vector theargs# mainarg#))))
     `(defn ~tname ~mainarg#
-       (let (vec (map vector ~theargs# mainarg))
+       (let #_(~['x `(first ~'a)])
+            [ (first ~theargs#)  (first ~mainarg#)]
          ~body))))
 
 (macroexpand '(defnr work [x y :& z]  (+ x 1)))
