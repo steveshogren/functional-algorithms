@@ -26,4 +26,13 @@
 
 (test-func 5 6 7 8)
 
+(defmacro splitter [name args & body]
+  (let [func (first body)
+        lister (second body)])
+  `(map func lister))
+
+(splitter
+ []
+ ((+ x 1) [1 2]))
+
 
