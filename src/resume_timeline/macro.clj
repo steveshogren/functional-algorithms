@@ -35,4 +35,40 @@
  []
  ((+ x 1) [1 2]))
 
+(defn defunits-chaining
+  [u units prev]
+  (if (some #(= u %) prev)
+    '(failed))
+  (let [spec (first (filter #(= u (first %)) units))]
+    (if (nil? spec)
+      '(error)
+      (let [chain (second spec)]
+        (if (list? chain)
+          (* (first chain)
+             (defunits-chaining
+               (second chain)
+               units
+               (cons u prev)))
+          chain)))))
+(+ 1 1)
+
+(defmacro defunits [quantity base-unit & units]
+  `(defmacro unit-of-type [valu un]
+     `(* ~valu
+         ~(case un
+            ~base-unit 1
+            ~(map #(
+                    `((~(first %))
+                      ~(defunits-chaining
+                         (first %)
+                         (cons `(~base-unit 1)
+                               (partition 2 units))
+                         nil)))
+                  (partition 2 units))))))
+
+(defunits time s
+  m 60
+  h (60 m))
+
+
 
