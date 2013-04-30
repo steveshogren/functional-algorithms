@@ -35,6 +35,7 @@
  []
  ((+ x 1) [1 2]))
 
+
 (defn defunits-chaining
   [u units prev]
   (if (some #(= u %) prev)
@@ -50,25 +51,25 @@
                units
                (cons u prev)))
           chain)))))
-(+ 1 1)
 
 (defmacro defunits [quantity base-unit & units]
-  `(defmacro unit-of-type [valu un]
-     `(* ~valu
-         ~(case un
+  `(defmacro ~(symbol (str "unit-of-" quantity))
+     ([valu# un#]
+     `(* ~valu#
+         ~(case un#
             ~base-unit 1
-            ~(map #(
-                    `((~(first %))
+            ~@(map (fn [x]
+                    `((~(first x))
                       ~(defunits-chaining
-                         (first %)
+                         (first x)
                          (cons `(~base-unit 1)
                                (partition 2 units))
                          nil)))
-                  (partition 2 units))))))
+                  (partition 2 units)))))))
 
 (defunits time s
   m 60
   h (60 m))
 
-
+(unit-of-time 4 m)
 
