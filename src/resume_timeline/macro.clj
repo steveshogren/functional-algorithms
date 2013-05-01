@@ -35,14 +35,14 @@
  []
  ((+ x 1) [1 2]))
 
-
-(defn defunits-chaining
-  [u units prev]
+(defn defunits-chaining [u units prev]
   (if (some #(= u %) prev)
-    '(failed))
+    (throw (Throwable. (str u " depends on " prev))))
+  (println units)
+  (println "-----")
   (let [spec (first (filter #(= u (first %)) units))]
     (if (nil? spec)
-      '(error)
+      (throw (Throwable. (str "unknown unit " u)))
       (let [chain (second spec)]
         (if (list? chain)
           (* (first chain)
@@ -56,8 +56,8 @@
   `(defmacro ~(symbol (str "unit-of-" quantity))
      ([valu# un#]
      `(* ~valu#
-         ~(case un#
-            ~base-unit 1
+         ~(if (= ~base-unit un#)
+            1
             ~@(map (fn [x]
                     `((~(first x))
                       ~(defunits-chaining
@@ -67,9 +67,12 @@
                          nil)))
                   (partition 2 units)))))))
 
+(macroexpand '(defunits time s
+     m 60
+     h 3600))
 (defunits time s
-  m 60
-  h (60 m))
+     m 60
+     h 3600)
 
 (unit-of-time 4 m)
 
