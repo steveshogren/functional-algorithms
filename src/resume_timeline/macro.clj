@@ -76,7 +76,7 @@
 
 (defunits time s
      m 60
-     h 3600)
+     h (60 m))
 
 (unit-of-time 4 h)
 
