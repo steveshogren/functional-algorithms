@@ -51,19 +51,24 @@
           chain)))))
 
 (defmacro defunits [quantity base-unit & units]
-  `(defmacro ~(symbol (str "unit-of-" quantity))
-     [valu# un#]
-     `(* ~valu#
-         ~(case un#
-           ~base-unit 1
-            ~@(mapcat (fn [x]
-                        `(~(first x)
-                          ~(defunits-chaining
-                             (first x)
-                             (cons `(~base-unit 1)
-                                   (partition 2 units))
-                             nil)))
-                      (partition 2 units))))))
+  (let [macro-name (symbol (str "unit-of-" quantity))
+        valsym (gensym "val__")
+        unitsym (gensym "unit__")]
+    (list `defmacro
+          macro-name
+          [valsym unitsym]
+       `(* ~valsym
+           (case ~unitsym
+              ~base-unit 1
+              ~@(mapcat (fn [x]
+                          `(~(first x)
+                            ~(defunits-chaining
+                               (first x)
+                               (cons `(~base-unit 1)
+                                     (partition 2 units))
+                               nil)))
+                        (partition 2 units)))))))
+
 
 (clojure.pprint/pprint  (macroexpand '(defunits time s
                    m 60
