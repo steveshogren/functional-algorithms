@@ -38,8 +38,6 @@
 (defn defunits-chaining [u units prev]
   (if (some #(= u %) prev)
     (throw (Throwable. (str u " depends on " prev))))
-  #_(println units)
-  #_(println "-----")
   (let [spec (first (filter #(= u (first %)) units))]
     (if (nil? spec)
       (throw (Throwable. (str "unknown unit " u)))
@@ -56,40 +54,26 @@
   `(defmacro ~(symbol (str "unit-of-" quantity))
      [valu# un#]
      `(* ~valu#
-         ~(if (= un# ~base-unit) 1
-            ~@(map (fn [x]
-                       `(~(first x)
-                         ~(defunits-chaining
-                             (first x)
-                             (cons `(~base-unit 1)
-                                   (partition 2 units))
-                             nil)))
-                     (partition 2 units))
-            #_(map (fn [x]
-                     `(~(first x)
-                       ~(defunits-chaining
-                          (first x)
-                          (cons `(~base-unit 1)
-                                (partition 2 units))
-                          nil)))
-                   (partition 2 units))))))
-
-(defmacro test []
-  `(~@(t t)))
-(clojure.pprint/pprint  (macroexpand '(test)))
-
+         ~(case un#
+           ~base-unit 1
+            ~@(flatten (map (fn [x]
+                               `(~(first x)
+                                 ~(defunits-chaining
+                                    (first x)
+                                    (cons `(~base-unit 1)
+                                          (partition 2 units))
+                                    nil)))
+                            (partition 2 units)))))))
 
 (clojure.pprint/pprint  (macroexpand '(defunits time s
                    m 60
                    h 3600)))
-;; transform ->
-;; (if (clojure.core/= un__2631__auto__ s) 1 (m 60) (h 3600)))))))
-;; (if (clojure.core/= un__2631__auto__ s) 1 m 60 h 3600))))))
+
 (defunits time s
      m 60
      h 3600)
 
-(unit-of-time 4 m)
+(unit-of-time 4 h)
 
 
 
