@@ -56,14 +56,14 @@
      `(* ~valu#
          ~(case un#
            ~base-unit 1
-            ~@(flatten (map (fn [x]
-                               `(~(first x)
-                                 ~(defunits-chaining
-                                    (first x)
-                                    (cons `(~base-unit 1)
-                                          (partition 2 units))
-                                    nil)))
-                            (partition 2 units)))))))
+            ~@(mapcat (fn [x]
+                        `(~(first x)
+                          ~(defunits-chaining
+                             (first x)
+                             (cons `(~base-unit 1)
+                                   (partition 2 units))
+                             nil)))
+                      (partition 2 units))))))
 
 (clojure.pprint/pprint  (macroexpand '(defunits time s
                    m 60
