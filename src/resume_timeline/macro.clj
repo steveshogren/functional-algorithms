@@ -80,5 +80,21 @@
 
 (unit-of-time 4 h)
 
+(ns http)
+
+(defn post [url]
+  {:body "hellp world"})
+
+(ns app
+  (:require [clojure.test :refer [deftest is run-tests]]))
+
+(deftest is-a-macro
+  (with-redefs [http/post (fn [url] {:body "goodbye world"})]
+    (is (= {:body "goodbye world"} (http/post "http://service.com/greet")))))
+
+(run-tests)
+
+
+
 
 
