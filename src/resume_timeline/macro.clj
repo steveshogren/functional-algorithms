@@ -95,6 +95,24 @@
 (run-tests)
 
 
+(defn rect [wd ht] {:Shape :Rect :wd wd :ht ht})
+(defn circle [radius] {:Shape :Circle :radius radius})
+
+(defmulti area :Shape)
+(defmethod area :Rect [r]
+  (* (:wd r) (:ht r)))
+(defmethod area :Circle [c]
+  (* (. Math PI) (* (:radius c) (:radius c))))
+(defmethod area :default [x] :oops)
+(def r (rect 4 13))
+(def c (circle 12))
+(area r)
+(area c)
+(area {})
+
+(derive ::circle ::shape)
+(isa? ::circle ::shape) 
+
 
 
 
